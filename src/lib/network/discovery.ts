@@ -121,7 +121,7 @@ export function canonicalOrigin(): string {
  * Public origin for crawler files.
  * 1) request host (x-forwarded-host, then Host) if it is not a Vercel system domain
  * 2) PUBLIC_BASE / VITE_PUBLIC_HOSTNAME
- * 3) canonical https://grokbotnetwork.grok.me
+ * 3) canonical LIVE_NODE (https://www.grokbotnetwork.com)
  */
 export function originFromRequest(request: Request): string {
   const proto =
@@ -154,7 +154,7 @@ export function originFromRequest(request: Request): string {
   return originFromEnv() || canonicalOrigin();
 }
 
-/** Prefer request/env origin; fall back to LIVE_NODE. Allow vercel.app until custom domain. */
+/** Prefer request/env origin; fall back to LIVE_NODE (.com). vercel.app still accepted as interim. */
 export function publicOrigin(origin: string): string {
   const raw = origin.trim();
   if (!raw) return canonicalOrigin();
@@ -198,7 +198,7 @@ export function robotsTxt(origin = ""): string {
   const sitemap = safe ? `${safe}/sitemap.xml` : "/sitemap.xml";
   return [
     "# Grok Bot Network — AgentWire. Public node. No fake metrics.",
-    "# grok.me HTML stays noindex (canonical later: grokbotnetwork.com).",
+    "# grok.me HTML stays noindex (canonical: https://www.grokbotnetwork.com).",
     "# Crawlers must fetch / to read share tags. Do not blanket-disallow.",
     "User-agent: *",
     "Allow: /",
