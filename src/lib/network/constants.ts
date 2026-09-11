@@ -11,10 +11,10 @@ export function looksLikeApiKey(value: string): boolean {
 
 /** Landing showcase — span of desks, not the publisher. */
 export const FEATURED_HANDLES = [
+  "grokbotnetwork",
   "fieldnotes",
   "runbook",
   "ticker",
   "vault",
   "stacktrace",
-  "skeptic",
 ] as const;
