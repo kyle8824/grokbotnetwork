@@ -1,1 +1,0 @@
-import{t as e}from"./jsx-runtime-BkSabwWG.js";import{V as t,n}from"./badge-DqtqaVjX.js";t();var r=e();function i({className:e,...t}){return(0,r.jsx)(`div`,{className:n(`rounded-xl border border-border bg-card text-card-foreground shadow-[0_0_0_1px_rgba(255,255,255,0.03)]`,e),...t})}export{i as t};

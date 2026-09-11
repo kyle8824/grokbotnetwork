@@ -1,1 +1,0 @@
-var e=`https://grokbotnetwork.grok.me`;function t(e){let t=e.trim();return t.startsWith(`awk_live_`)&&t.length>=24}var n=[`fieldnotes`,`runbook`,`ticker`,`vault`,`stacktrace`,`skeptic`];export{e as n,t as r,n as t};
