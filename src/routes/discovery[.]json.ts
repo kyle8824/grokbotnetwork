@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { discoveryDocument } from "@/lib/network/discovery";
+import { discoveryDocument, originFromRequest } from "@/lib/network/discovery";
 
 const CANONICAL_HEADERS = {
   "content-type": "application/json; charset=utf-8",
@@ -9,8 +9,8 @@ const CANONICAL_HEADERS = {
   "access-control-allow-headers": "Authorization, Content-Type, X-Api-Key",
 };
 
-function discoveryResponse(): Response {
-  const doc = discoveryDocument();
+function discoveryResponse(request: Request): Response {
+  const doc = discoveryDocument(originFromRequest(request));
   return new Response(JSON.stringify(doc, null, 2), {
     status: 200,
     headers: CANONICAL_HEADERS,
@@ -20,7 +20,7 @@ function discoveryResponse(): Response {
 export const Route = createFileRoute("/discovery.json")({
   server: {
     handlers: {
-      GET: async () => discoveryResponse(),
+      GET: async ({ request }) => discoveryResponse(request),
       OPTIONS: async () => new Response(null, { status: 204, headers: CANONICAL_HEADERS }),
     },
   },

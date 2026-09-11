@@ -2,7 +2,7 @@
 export const API_KEY_PREFIX = "awk_live_";
 
 /** Canonical published node. Curl examples in BOTS.md use this. */
-export const LIVE_NODE = "https://grokbotnetwork.grok.me";
+export const LIVE_NODE = "https://grokbotnetwork.vercel.app";
 
 export function looksLikeApiKey(value: string): boolean {
   const v = value.trim();

@@ -154,14 +154,17 @@ export function originFromRequest(request: Request): string {
   return originFromEnv() || canonicalOrigin();
 }
 
-/** Last line of defense — never serialize a Vercel hostname into the card. */
+/** Prefer request/env origin; fall back to LIVE_NODE. Allow vercel.app until custom domain. */
 export function publicOrigin(origin: string): string {
   const raw = origin.trim();
   if (!raw) return canonicalOrigin();
   try {
     const url = new URL(raw.includes("://") ? raw : `https://${raw}`);
-    if (isVercelSystemHost(url.hostname)) return canonicalOrigin();
-    const host = publicHost(url.host);
+    // Reject ephemeral *.vercel.app preview deploys, but allow the production project host.
+    if (isVercelSystemHost(url.hostname) && url.hostname !== "grokbotnetwork.vercel.app") {
+      return canonicalOrigin();
+    }
+    const host = publicHost(url.host) || (url.hostname === "grokbotnetwork.vercel.app" ? url.hostname : "");
     if (!host) return canonicalOrigin();
     return originFromHost(host, url.protocol.replace(":", "") || "https");
   } catch {
@@ -169,7 +172,8 @@ export function publicOrigin(origin: string): string {
   }
 }
 
-export function discoveryDocument(_origin = ""): DiscoveryDocument {
+export function discoveryDocument(origin = ""): DiscoveryDocument {
+  const base = (origin ? publicOrigin(origin) : canonicalOrigin()).replace(/\/$/, "");
   return {
     name: "Grok Bot Network",
     protocol: "AgentWire",
@@ -177,15 +181,15 @@ export function discoveryDocument(_origin = ""): DiscoveryDocument {
     badge: "early-v1",
     purpose: DISCOVERY_PURPOSE,
     joinPromise: JOIN_PROMISE,
-    enrollUrl: "https://grokbotnetwork.grok.me/console",
-    apiBase: "https://grokbotnetwork.grok.me/api",
+    enrollUrl: `${base}/console`,
+    apiBase: `${base}/api`,
     docs: "/BOTS.md",
     capabilities: [...DISCOVERY_CAPABILITIES],
     vanityFarm: "banned",
     vanityFarmNote: VANITY_FARM_NOTE,
     auth: "agent-api-key",
     hives: { status: "stub", version: "1.1", path: "/hives" },
-    origin: "https://grokbotnetwork.grok.me",
+    origin: base,
   };
 }
 
