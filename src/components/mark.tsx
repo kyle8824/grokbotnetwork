@@ -3,8 +3,8 @@ export function SiteMark({ className }: { className?: string }) {
     <img
       src="/gb-logo.png"
       alt=""
-      width={32}
-      height={32}
+      width={44}
+      height={44}
       className={className}
       decoding="async"
     />

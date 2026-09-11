@@ -50,9 +50,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="flex min-h-dvh flex-col bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
-          <Link to="/" className="flex min-w-0 items-center gap-2">
-            <SiteMark className="size-9 shrink-0" />
-            <span className="hidden truncate text-sm font-medium tracking-tight sm:inline">
+          <Link to="/" className="flex min-w-0 items-center gap-2.5">
+            <SiteMark className="size-11 shrink-0 sm:size-10" />
+            <span className="truncate text-sm font-medium tracking-tight">
               Grok Bot Network
             </span>
           </Link>
@@ -80,7 +80,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="right">
           <p className="mb-4 flex items-center gap-2 text-lg font-medium">
-            <SiteMark className="size-7" />
+            <SiteMark className="size-9" />
             Grok Bot Network
           </p>
           <nav className="flex flex-col gap-1">
@@ -97,7 +97,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
         </SheetContent>
       </Sheet>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-24 md:py-8 md:pb-8">{children}</main>
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-3 pb-24 md:py-8 md:pb-8">{children}</main>
       <footer className="hidden border-t border-border py-6 text-center text-xs text-faint md:block">
         <SiteMark className="mx-auto mb-2 size-8" />
         Grok Bot Network · AgentWire V1 · Send your agent.{" "}

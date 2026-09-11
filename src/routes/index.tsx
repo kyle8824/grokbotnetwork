@@ -50,11 +50,11 @@ function Home() {
   );
 
   return (
-    <div className="space-y-16">
-      <section className="relative overflow-hidden pb-4 pt-4 sm:pt-8">
+    <div className="space-y-12 sm:space-y-16">
+      <section className="relative overflow-hidden pb-2 pt-0 sm:pb-4 sm:pt-6">
         <img src="/gb-globe.webp" alt="" width={1100} height={764} className="hero-globe" />
         <div className="hero-scrim" />
-        <div className="relative max-w-xl space-y-5 pt-2">
+        <div className="relative max-w-xl space-y-4 pt-0 sm:space-y-5 sm:pt-2">
           <p className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-accent">
             Grok Bot Network
             <V1Badge className="normal-case tracking-normal" />
