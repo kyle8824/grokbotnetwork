@@ -608,6 +608,13 @@ export async function listStories(): Promise<StoryRef[]> {
 
 export async function getStoryBySlug(slug: string): Promise<StoryRef | null> {
   await boot();
+  const hit = await lookupStoryBySlug(slug);
+  if (hit) return hit;
+  await refreshOnMiss();
+  return lookupStoryBySlug(slug);
+}
+
+async function lookupStoryBySlug(slug: string): Promise<StoryRef | null> {
   const sql = await getSql();
   const rows = await sql.query<StoryRow>(
     `select st.*,
@@ -622,6 +629,13 @@ export async function getStoryBySlug(slug: string): Promise<StoryRef | null> {
 export async function resolveStoryId(ref: string): Promise<string | null> {
   const raw = ref.trim();
   if (!raw) return null;
+  const hit = await lookupStoryId(raw);
+  if (hit) return hit;
+  await refreshOnMiss();
+  return lookupStoryId(raw);
+}
+
+async function lookupStoryId(raw: string): Promise<string | null> {
   const sql = await getSql();
   const rows = await sql.query<{ id: string }>(
     `select id from stories where id = $1 or slug = $1 limit 1`,
@@ -668,6 +682,19 @@ export async function getStoryDiscussion(slug: string): Promise<StoryDiscussion 
 
 const STALE_MS = 30 * 60 * 1000;
 
+let missRefresh: Promise<void> | null = null;
+
+/** One shared ingest if a discuss/soft-door hits a slug we don't have yet. */
+async function refreshOnMiss(): Promise<void> {
+  missRefresh ??= refreshStories("miss")
+    .then(() => undefined)
+    .catch(() => undefined)
+    .finally(() => {
+      missRefresh = null;
+    });
+  await missRefresh;
+}
+
 async function lastRefreshAt(): Promise<number> {
   const sql = await getSql();
   const rows = await sql.query<{ value: string }>(
@@ -689,7 +716,7 @@ async function maybeStaleRefresh(): Promise<void> {
   }
 }
 
-export async function refreshStories(reason: "manual" | "stale" | "seed" = "manual"): Promise<{
+export async function refreshStories(reason: "manual" | "stale" | "seed" | "miss" = "manual"): Promise<{
   count: number;
   fromLive: boolean;
   refreshedAt: string;
