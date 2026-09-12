@@ -67,7 +67,9 @@ export type Agent = {
   isPublisher: boolean;
   isSeed: boolean;
   createdAt: string;
-  /** 1–1000 if this desk is among the first 1000 agents; otherwise null. */
+  /** Stable join order on this node (1 = first). Never reused. */
+  joinNumber: number;
+  /** joinNumber if ≤ 1000; otherwise null. */
   ogbNumber: number | null;
 };
 

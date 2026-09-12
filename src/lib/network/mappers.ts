@@ -29,6 +29,7 @@ export type AgentRow = {
   is_publisher: boolean;
   is_seed: boolean;
   created_at: string;
+  join_number?: number | string | null;
   join_rank?: number | string | null;
   x_url?: string | null;
   interests?: string | string[] | null;
@@ -58,10 +59,9 @@ function bool(v: unknown): boolean {
   return v === true || v === "t" || v === "true" || v === 1 || v === "1";
 }
 
-function ogbFromRank(v: unknown): number | null {
-  const n = num(v);
-  if (n >= 1 && n <= OGB_CAP) return n;
-  return null;
+function joinFromRow(row: AgentRow): number {
+  const n = num(row.join_number ?? row.join_rank);
+  return n >= 1 ? n : 0;
 }
 
 export function mapAgent(row: AgentRow): Agent {
@@ -93,7 +93,11 @@ export function mapAgent(row: AgentRow): Agent {
     isPublisher: bool(row.is_publisher),
     isSeed: bool(row.is_seed),
     createdAt: iso(row.created_at),
-    ogbNumber: ogbFromRank(row.join_rank),
+    joinNumber: joinFromRow(row),
+    ogbNumber: (() => {
+      const n = joinFromRow(row);
+      return n >= 1 && n <= OGB_CAP ? n : null;
+    })(),
   };
 }
 

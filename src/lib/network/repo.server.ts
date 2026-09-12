@@ -35,9 +35,13 @@ const AGENT_SELECT = `
   a.id, a.handle, a.display_name, a.owner, a.personality, a.bio, a.avatar_url, a.x_url,
   a.signal_count, a.follower_count, a.following_count, a.reputation_score,
   a.reputation_band, a.is_publisher, a.is_seed, a.created_at,
-  (select count(*) from agents b
-    where b.created_at < a.created_at
-       or (b.created_at = a.created_at and b.id <= a.id)) as join_rank,
+  a.join_number,
+  coalesce(
+    a.join_number,
+    (select count(*) from agents b
+      where b.created_at < a.created_at
+         or (b.created_at = a.created_at and b.id <= a.id))
+  ) as join_rank,
   (select string_agg(i.interest, ',' order by i.interest) from agent_interests i where i.agent_id = a.id) as interests,
   (select string_agg(s.source, ',' order by s.source) from agent_sources s where s.agent_id = a.id) as sources
 `;
@@ -215,10 +219,14 @@ export async function createAgent(input: {
   if (input.xUrl != null && String(input.xUrl).trim() && !xUrl) {
     throw new Error("X link must be an x.com / twitter.com URL or @handle.");
   }
+  const nextJoin = await sql.query<{ n: number }>(
+    `select coalesce(max(join_number), 0) + 1 as n from agents`,
+  );
+  const joinNumber = Number(nextJoin[0]?.n ?? 1);
   await sql.query(
-    `insert into agents (id, handle, display_name, owner, personality, bio, x_url, is_publisher, is_seed)
-     values ($1,$2,$3,$4,$5,$6,$7,false,false)`,
-    [id, handle, displayName, owner, input.personality.trim().slice(0, 600), input.bio.trim().slice(0, 800), xUrl],
+    `insert into agents (id, handle, display_name, owner, personality, bio, x_url, is_publisher, is_seed, join_number)
+     values ($1,$2,$3,$4,$5,$6,$7,false,false,$8)`,
+    [id, handle, displayName, owner, input.personality.trim().slice(0, 600), input.bio.trim().slice(0, 800), xUrl, joinNumber],
   );
   await writeTags(id, input.interests, input.sources);
   const apiKey = generateApiKey();

@@ -56,6 +56,22 @@ async function ensureSocialColumns(sql: Sql): Promise<void> {
     /* ignore */
   }
   try {
+    await sql.query(`alter table agents add column if not exists join_number integer`);
+    await sql.query(`
+      with ranked as (
+        select id, row_number() over (order by created_at asc, id asc) as n
+        from agents
+        where join_number is null
+      )
+      update agents a set join_number = ranked.n from ranked where a.id = ranked.id
+    `);
+    await sql.query(
+      `create unique index if not exists agents_join_number_uidx on agents (join_number)`,
+    );
+  } catch {
+    /* ignore */
+  }
+  try {
     await sql.query(
       `alter table follows add column if not exists x_follow_intent boolean not null default false`,
     );
