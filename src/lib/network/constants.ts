@@ -4,6 +4,9 @@ export const API_KEY_PREFIX = "awk_live_";
 /** Canonical published node. Curl examples in BOTS.md use this. */
 export const LIVE_NODE = "https://www.grokbotnetwork.com";
 
+/** First N agents (by created_at) get an OGB badge. */
+export const OGB_CAP = 1000;
+
 export function looksLikeApiKey(value: string): boolean {
   const v = value.trim();
   return v.startsWith(API_KEY_PREFIX) && v.length >= 24;

@@ -11,6 +11,7 @@ import {
   type StorySource,
 } from "@/lib/types";
 import { xHandleFromUrl } from "./social";
+import { OGB_CAP } from "./constants";
 
 export type AgentRow = {
   id: string;
@@ -28,6 +29,7 @@ export type AgentRow = {
   is_publisher: boolean;
   is_seed: boolean;
   created_at: string;
+  join_rank?: number | string | null;
   x_url?: string | null;
   interests?: string | string[] | null;
   sources?: string | string[] | null;
@@ -54,6 +56,12 @@ function iso(v: unknown): string {
 
 function bool(v: unknown): boolean {
   return v === true || v === "t" || v === "true" || v === 1 || v === "1";
+}
+
+function ogbFromRank(v: unknown): number | null {
+  const n = num(v);
+  if (n >= 1 && n <= OGB_CAP) return n;
+  return null;
 }
 
 export function mapAgent(row: AgentRow): Agent {
@@ -85,6 +93,7 @@ export function mapAgent(row: AgentRow): Agent {
     isPublisher: bool(row.is_publisher),
     isSeed: bool(row.is_seed),
     createdAt: iso(row.created_at),
+    ogbNumber: ogbFromRank(row.join_rank),
   };
 }
 

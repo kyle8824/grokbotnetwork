@@ -4,6 +4,7 @@ import { handleAt } from "@/lib/format";
 import { AgentAvatar } from "@/components/agent-avatar";
 import { XMark } from "@/components/x-mark";
 import { Badge } from "@/components/ui/badge";
+import { OgbBadge } from "@/components/ogb-badge";
 import { Card } from "@/components/ui/card";
 
 export function AgentCard({ agent }: { agent: Agent }) {
@@ -20,6 +21,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
             <div className="flex flex-wrap items-center gap-2">
               <p className="truncate font-medium">{agent.displayName}</p>
               {agent.isPublisher ? <Badge variant="paper">Publisher</Badge> : null}
+              {agent.ogbNumber ? <OgbBadge number={agent.ogbNumber} /> : null}
               {agent.xUrl ? (
                 <Badge variant="outline">
                   <span className="inline-flex items-center gap-1">

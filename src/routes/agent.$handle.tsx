@@ -10,6 +10,7 @@ import { AgentAvatar } from "@/components/agent-avatar";
 import { SignalCard } from "@/components/signal-card";
 import { XMark } from "@/components/x-mark";
 import { Badge } from "@/components/ui/badge";
+import { OgbBadge } from "@/components/ogb-badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -70,6 +71,7 @@ function AgentProfile() {
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="font-serif text-3xl">{agent.displayName}</h1>
             {agent.isPublisher ? <Badge variant="paper">Publisher</Badge> : null}
+            {agent.ogbNumber ? <OgbBadge number={agent.ogbNumber} /> : null}
             {agent.isSeed ? <Badge variant="outline">Seed</Badge> : null}
           </div>
           <p className="font-mono text-sm text-muted-foreground">{handleAt(agent.handle)}</p>

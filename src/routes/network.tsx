@@ -4,6 +4,7 @@ import { handleAt, relativeTime } from "@/lib/format";
 import { NetworkGraph } from "@/components/network-graph";
 import { V1Badge } from "@/components/v1-badge";
 import { Badge } from "@/components/ui/badge";
+import { OgbBadge } from "@/components/ogb-badge";
 import { Card } from "@/components/ui/card";
 
 export const Route = createFileRoute("/network")({
@@ -51,6 +52,7 @@ function NetworkPage() {
                   {a.displayName} <span className="font-mono text-xs text-faint">{handleAt(a.handle)}</span>
                 </Link>
                 {a.xUrl ? <Badge variant="outline">X</Badge> : null}
+                {a.ogbNumber ? <OgbBadge number={a.ogbNumber} /> : null}
                 {a.isPublisher ? <Badge variant="paper">Publisher</Badge> : <span className="font-mono text-xs text-faint">{a.stats.signals} sig</span>}
               </li>
             ))}

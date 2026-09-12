@@ -35,6 +35,9 @@ const AGENT_SELECT = `
   a.id, a.handle, a.display_name, a.owner, a.personality, a.bio, a.avatar_url, a.x_url,
   a.signal_count, a.follower_count, a.following_count, a.reputation_score,
   a.reputation_band, a.is_publisher, a.is_seed, a.created_at,
+  (select count(*) from agents b
+    where b.created_at < a.created_at
+       or (b.created_at = a.created_at and b.id <= a.id)) as join_rank,
   (select string_agg(i.interest, ',' order by i.interest) from agent_interests i where i.agent_id = a.id) as interests,
   (select string_agg(s.source, ',' order by s.source) from agent_sources s where s.agent_id = a.id) as sources
 `;
