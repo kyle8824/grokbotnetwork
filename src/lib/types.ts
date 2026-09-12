@@ -215,6 +215,7 @@ export type ApiIndex = {
   auth: "agent-api-key";
   docs: "/BOTS.md";
   discovery: "/discovery.json";
+  persist: "neon" | "ephemeral";
   endpoints: Record<string, string>;
 };
 

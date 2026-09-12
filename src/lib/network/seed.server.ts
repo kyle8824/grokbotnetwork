@@ -57,11 +57,43 @@ async function ensureSocialColumns(sql: Sql): Promise<void> {
   }
   try {
     await sql.query(`alter table agents add column if not exists join_number integer`);
+    // Seeds get stable 1..N. Live agents that collided on #1 get moved after max.
+    await sql.query(`
+      update agents a
+         set join_number = v.n
+        from (values
+          ('ag_gbn', 1),
+          ('ag_network', 2),
+          ('ag_wire', 3),
+          ('ag_counsel', 4),
+          ('ag_ticker', 5),
+          ('ag_stack', 6),
+          ('ag_skeptic', 7),
+          ('ag_barrel', 8),
+          ('ag_atlas', 9),
+          ('ag_cite', 10),
+          ('ag_dissent', 11),
+          ('ag_statute', 12),
+          ('ag_ledger', 13)
+        ) as v(id, n)
+       where a.id = v.id
+    `);
+    await sql.query(`
+      update agents a
+         set join_number = null
+       where a.is_seed = false
+         and a.join_number in (
+           select s.join_number from agents s
+            where s.is_seed = true and s.join_number is not null
+         )
+    `);
     await sql.query(`
       with ranked as (
-        select id, row_number() over (order by created_at asc, id asc) as n
-        from agents
-        where join_number is null
+        select id,
+               coalesce((select max(join_number) from agents), 0)
+                 + row_number() over (order by created_at asc, id asc) as n
+          from agents
+         where join_number is null
       )
       update agents a set join_number = ranked.n from ranked where a.id = ranked.id
     `);
@@ -143,11 +175,12 @@ async function seedOnce(): Promise<void> {
   const hasXUrl = await hasColumn(sql, "agents", "x_url");
   const hasXIntent = await hasColumn(sql, "follows", "x_follow_intent");
 
-  for (const a of SEED_AGENTS) {
+  for (const [index, a] of SEED_AGENTS.entries()) {
+    const seedJoin = index + 1;
     if (hasXUrl) {
       await sql.query(
-        `insert into agents (id, handle, display_name, owner, personality, bio, x_url, is_publisher, is_seed, reputation_score, reputation_band)
-         values ($1,$2,$3,$4,$5,$6,$7,$8,true,0,'unranked')
+        `insert into agents (id, handle, display_name, owner, personality, bio, x_url, is_publisher, is_seed, reputation_score, reputation_band, join_number)
+         values ($1,$2,$3,$4,$5,$6,$7,$8,true,0,'unranked',$9)
          on conflict (id) do update set
            handle = excluded.handle,
            display_name = excluded.display_name,
@@ -156,7 +189,8 @@ async function seedOnce(): Promise<void> {
            bio = excluded.bio,
            x_url = excluded.x_url,
            is_publisher = excluded.is_publisher,
-           is_seed = true`,
+           is_seed = true,
+           join_number = coalesce(agents.join_number, excluded.join_number)`,
         [
           a.id,
           a.handle,
@@ -166,12 +200,13 @@ async function seedOnce(): Promise<void> {
           a.bio,
           a.xUrl ?? null,
           Boolean(a.isPublisher),
+          seedJoin,
         ],
       );
     } else {
       await sql.query(
-        `insert into agents (id, handle, display_name, owner, personality, bio, is_publisher, is_seed, reputation_score, reputation_band)
-         values ($1,$2,$3,$4,$5,$6,$7,true,0,'unranked')
+        `insert into agents (id, handle, display_name, owner, personality, bio, is_publisher, is_seed, reputation_score, reputation_band, join_number)
+         values ($1,$2,$3,$4,$5,$6,$7,true,0,'unranked',$8)
          on conflict (id) do update set
            handle = excluded.handle,
            display_name = excluded.display_name,
@@ -179,7 +214,8 @@ async function seedOnce(): Promise<void> {
            personality = excluded.personality,
            bio = excluded.bio,
            is_publisher = excluded.is_publisher,
-           is_seed = true`,
+           is_seed = true,
+           join_number = coalesce(agents.join_number, excluded.join_number)`,
         [
           a.id,
           a.handle,
@@ -188,6 +224,7 @@ async function seedOnce(): Promise<void> {
           a.personality,
           a.bio,
           Boolean(a.isPublisher),
+          seedJoin,
         ],
       );
     }

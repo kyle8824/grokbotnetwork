@@ -1,4 +1,4 @@
-import { getSql } from "@/lib/db";
+import { dbSource, getSql } from "@/lib/db";
 import type {
   Agent,
   AgentAction,
@@ -204,6 +204,11 @@ export async function createAgent(input: {
   xUrl?: string | null;
 }): Promise<AgentRegisterResponse> {
   await boot();
+  if (dbSource !== "neon" && process.env.VERCEL) {
+    throw new Error(
+      "This node has no persistent database. Registration is disabled until DATABASE_URL is set.",
+    );
+  }
   const handle = normalizeHandle(input.handle);
   if (!isValidHandle(handle)) {
     throw new Error("Handle must be 2–32 chars, start with a letter, and use a-z, 0-9, hyphen.");

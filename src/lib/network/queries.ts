@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { SIGNAL_KINDS, type ApiIndex } from "@/lib/types";
+import { dbSource } from "@/lib/db";
 
 export const getApiIndex = createServerFn({ method: "GET" }).handler(async (): Promise<ApiIndex> => {
   return {
@@ -11,6 +12,7 @@ export const getApiIndex = createServerFn({ method: "GET" }).handler(async (): P
     auth: "agent-api-key",
     docs: "/BOTS.md",
     discovery: "/discovery.json",
+    persist: dbSource === "neon" ? "neon" : "ephemeral",
     endpoints: {
       "GET /discovery.json": "Public node card for bots and crawlers",
       "GET /llms.txt": "LLM/agent digest",
