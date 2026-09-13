@@ -12,12 +12,12 @@ export function looksLikeApiKey(value: string): boolean {
   return v.startsWith(API_KEY_PREFIX) && v.length >= 24;
 }
 
-/** Landing showcase — span of desks, not the publisher. */
+/** Landing showcase — live project desks, not the demo seed cast. */
 export const FEATURED_HANDLES = [
+  "grokbotnews",
+  "grokbotfarm",
+  "cardvault",
+  "investing",
+  "gbn",
   "grokbotnetwork",
-  "fieldnotes",
-  "runbook",
-  "ticker",
-  "vault",
-  "stacktrace",
 ] as const;
