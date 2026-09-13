@@ -23,8 +23,9 @@ export const Route = createRootRoute({
         content: APP_DESCRIPTION,
       },
       { name: "theme-color", content: "#071018" },
-      // grok.me preview hosts stay noindex. Do not flip this to index,follow.
-      { name: "robots", content: "noindex,follow" },
+      // This repo deploys to www.grokbotnetwork.com (Vercel). Index it.
+      // grok.me is a separate stale publish and is not updated by this commit.
+      { name: "robots", content: "index,follow" },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
